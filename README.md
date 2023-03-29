@@ -2,7 +2,6 @@
 Process for generating a restrictive permissions policy that can be used for a specific CDK stack. Utilizes AWS's Access Analyzer to review CloudTrail activity.
 
 ## AWS Setup
-The following steps will only need to be performed once. 
 
 - Create an AWS role with admin permissions (this will ensure that the stack does not encounter any permissions issues during deployment)
 - Create a CloudTrail for the account containing the AWS admin role. Select 'Management events' under **Events** and 'Read' and 'Write' under **Managment events**. Ensure 'Multi-region trail' is enabled
@@ -15,12 +14,12 @@ The following steps will only need to be performed once.
 [IAM Access Anaylzer policy generation](https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-policy-generation.html)
 
 ## GitHub Workflow
-Below is an example workflow that utilizes the aws resources set up above. This example uses OIDC to allow the github workflow to assume the admin role (see [OIDC_Process](https://github.com/NASA-IMPACT/Caden_Lessons_Learned/blob/main/OIDC_Process.md) for instructions on setting this up). From here it installs the aws CDK, records the start time, deploys and destorys the CDK app, starts policy generation, waits for it to finish, and returns the resulting policy once generated. Note that on occasion the policy generator will generate a blank poliocy. In these instances you will need to run the workflow again.
+Below is a github workflow that utilizes the aws resources set up above. It uses OIDC to allow the github workflow to assume the admin role created in the previous steps (see [OIDC_Process](https://github.com/NASA-IMPACT/Caden_Lessons_Learned/blob/main/OIDC_Process.md) for instructions on setting this up). From here it installs the aws CDK, records the start time, deploys and destorys the CDK app, starts policy generation, waits for it to finish, and returns the resulting policy once generated. Note that on occasion the policy generator will generate a blank poliocy. In these instances you will need to run the workflow again. Additionally, the policies generated may not always be complete. These are to be used as a starting point for further testing.
 
 ``` yaml
 name: CDK Policy Generator
 on:
-  push
+  workflow_dispatch:
 env:
   AWS_REGION : "<AWS-region>"
 ## These permissions are required for OIDC connection  
